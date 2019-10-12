@@ -5,7 +5,7 @@ gem 'rails', '~> 4.2.6'
 # Удобная админка для управления любыми сущностями
 gem 'rails_admin'
 
-gem 'devise', '~> 4.1.1'
+gem 'devise', '~> 4.7.1'
 gem 'devise-i18n'
 
 gem 'uglifier', '>= 1.3.0'
@@ -15,11 +15,13 @@ gem 'twitter-bootstrap-rails'
 gem 'font-awesome-rails'
 gem 'russian'
 
+gem "nokogiri", ">= 1.10.4"
+
 group :development, :test do
   gem 'sqlite3', '~> 1.3.13'
   gem 'byebug'
   gem 'rspec-rails', '~> 3.4'
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'shoulda-matchers'
 
   # Гем, который использует rspec, чтобы смотреть наш сайт
