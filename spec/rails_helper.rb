@@ -1,15 +1,20 @@
+# frozen_string_literal: true
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
-require File.expand_path('../../config/environment', __FILE__)
+require File.expand_path('../config/environment', __dir__)
 # Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+if Rails.env.production?
+  abort('The Rails environment is running in production mode!')
+end
 require 'spec_helper'
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # специальные "матчеры" - методы, удобные для тестирования валидаций
 Shoulda::Matchers.configure do |config|
-  config.integrate do |with| with.test_framework :rspec
+  config.integrate do |with|
+    with.test_framework :rspec
     with.library :rails
   end
 end
@@ -33,7 +38,7 @@ RSpec.configure do |config|
 
   # В тестах на контроллеры и представления подключаем специальные
   # хелперы для авторизации с помощью девайс
-  config.include Devise::TestHelpers, type: :controller
+  config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::TestHelpers, type: :view
 
   # Подключаем в фичах специальные хелперы для авторизации
@@ -61,5 +66,4 @@ RSpec.configure do |config|
 end
 
 # Это нужно, чтобы капибара искала стили и js в правильном месте
-Capybara.asset_host = "http://localhost:3000"
-
+Capybara.asset_host = 'http://localhost:3000'

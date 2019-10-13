@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # (c) goodprogrammer.ru
 #
 # Основной игровой контроллер
@@ -22,17 +24,15 @@ class GamesController < ApplicationController
 
   # создаем новую игру и отправляем на экшен #show в случае успеха
   def create
-    begin
-      # создаем игру для залогиненного юзера
-      @game = Game.create_game_for_user!(current_user)
+    # создаем игру для залогиненного юзера
+    @game = Game.create_game_for_user!(current_user)
 
-      # отправляемся на страницу игры
-      redirect_to game_path(@game), notice: I18n.t('controllers.games.game_created', created_at: @game.created_at)
-    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => ex # если ошибка создания игры
-      Rails.logger.error("Error creating game for user #{current_user.id}, msg = #{ex}. #{ex.backtrace}")
-      # отправляемся назад с алертом
-      redirect_to :back, alert: I18n.t('controllers.games.game_not_created')
-    end
+    # отправляемся на страницу игры
+    redirect_to game_path(@game), notice: I18n.t('controllers.games.game_created', created_at: @game.created_at)
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e # если ошибка создания игры
+    Rails.logger.error("Error creating game for user #{current_user.id}, msg = #{e}. #{e.backtrace}")
+    # отправляемся назад с алертом
+    redirect_to :back, alert: I18n.t('controllers.games.game_not_created')
   end
 
   # params[:letter] - единственный параметр
@@ -64,14 +64,13 @@ class GamesController < ApplicationController
       # <controller>/<action>.<format>.erb (в нашем случае games/answer.js.erb)
       format.js {}
     end
-
   end
 
   # вызывается из вьюхи без параметров
   def take_money
     @game.take_money!
     redirect_to user_path(current_user),
-                flash: {warning: I18n.t('controllers.games.game_finished', prize: view_context.number_to_currency(@game.prize))}
+                flash: { warning: I18n.t('controllers.games.game_finished', prize: view_context.number_to_currency(@game.prize)) }
   end
 
   # запрашиваем помощь в текущем вопросе
@@ -79,30 +78,35 @@ class GamesController < ApplicationController
   def help
     # используем помощь в игре и по результату задаем сообщение юзеру
     msg = if @game.use_help(params[:help_type].to_sym)
-            {flash: {info: I18n.t('controllers.games.help_used')}}
+            { flash: { info: I18n.t('controllers.games.help_used') } }
           else
-            {alert: I18n.t('controllers.games.help_not_used')}
+            { alert: I18n.t('controllers.games.help_not_used') }
           end
 
     redirect_to game_path(@game), msg
   end
 
-
   private
 
   def redirect_from_finished_game!
-    redirect_to user_path(current_user), alert: I18n.t('controllers.games.game_closed', game_id: @game.id) if @game.finished?
+    if @game.finished?
+      redirect_to user_path(current_user), alert: I18n.t('controllers.games.game_closed', game_id: @game.id)
+    end
   end
 
   def goto_game_in_progress!
     # вот нам и пригодился наш scope из модели Game
     game_in_progress = current_user.games.in_progress.first
-    redirect_to game_path(game_in_progress), alert: I18n.t('controllers.games.game_not_finished') unless game_in_progress.blank?
+    unless game_in_progress.blank?
+      redirect_to game_path(game_in_progress), alert: I18n.t('controllers.games.game_not_finished')
+    end
   end
 
   def set_game
     @game = current_user.games.find_by(id: params[:id])
     # если у current_user нет игры - посылаем
-    redirect_to root_path, alert: I18n.t('controllers.games.not_your_game') if @game.blank?
+    if @game.blank?
+      redirect_to root_path, alert: I18n.t('controllers.games.not_your_game')
+    end
   end
 end
