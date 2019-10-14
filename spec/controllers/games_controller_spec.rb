@@ -177,5 +177,40 @@ RSpec.describe GamesController, type: :controller do
       expect(response).to redirect_to(user_path(user))
       expect(flash[:alert]).to be
     end
+
+    context 'help fifty fifty' do
+      it 'verifies that the user can use help' do
+        expect(game_w_questions.current_game_question.help_hash).to be_empty
+
+        put :help, id: game_w_questions.id, help_type: :fifty_fifty
+
+        game = assigns(:game)
+        game_question = game.current_game_question
+        fifty_fifty = game_question.help_hash[:fifty_fifty]
+
+        expect(game_question.help_hash).to include(:fifty_fifty)
+
+        expect(fifty_fifty).to start_with(game_question.correct_answer_key)
+        expect(fifty_fifty.size).to eq 2
+
+        expect(response).to redirect_to(game_path(game))
+        expect(flash[:info]).to be
+      end
+
+      it 'this confirms that the user cannot use the help' do
+        # используем подсказку
+        game_w_questions.use_help(:fifty_fifty)
+        expect(game_w_questions.current_game_question.help_hash).not_to be_empty
+        expect(game_w_questions.current_game_question.help_hash).to include(:fifty_fifty)
+
+        # используем подсказку повторно
+        put :help, id: game_w_questions.id, help_type: :fifty_fifty
+
+        game = assigns(:game)
+
+        expect(response).to redirect_to(game_path(game))
+        expect(flash[:alert]).to be
+      end
+    end
   end
 end

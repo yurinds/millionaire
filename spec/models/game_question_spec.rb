@@ -49,4 +49,41 @@ RSpec.describe GameQuestion, type: :model do
     # правильный ответ b
     expect(game_question.correct_answer_key).to eq('b')
   end
+
+  it 'using method .help_hash' do
+    expect(game_question.help_hash).to be_empty
+
+    game_question.add_audience_help
+    expect(game_question.help_hash).to include(:audience_help)
+    ah = game_question.help_hash[:audience_help]
+    expect(ah.keys).to contain_exactly('a', 'b', 'c', 'd')
+
+    game_question.add_friend_call
+    expect(game_question.help_hash).to include(:friend_call)
+
+    game_question.add_fifty_fifty
+    expect(game_question.help_hash).to include(:fifty_fifty)
+    # правильный ответ 'b'
+    expect(game_question.help_hash[:fifty_fifty]).to start_with('b')
+  end
+
+  it 'using help fifty fifty' do
+    expect(game_question.help_hash).to be_empty
+
+    game_question.add_fifty_fifty
+
+    expect(game_question.help_hash).to include(:fifty_fifty)
+    fifty_fifty = game_question.help_hash[:fifty_fifty]
+    # правильный ответ 'b'
+    expect(fifty_fifty).to start_with('b')
+    expect(fifty_fifty.size).to eq 2
+  end
+
+  it 'using help friend call' do
+    expect(game_question.help_hash).to be_empty
+
+    game_question.add_friend_call
+
+    expect(game_question.help_hash).to include(:friend_call)
+  end
 end
