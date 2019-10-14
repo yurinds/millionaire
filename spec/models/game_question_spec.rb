@@ -75,7 +75,7 @@ RSpec.describe GameQuestion, type: :model do
     expect(game_question.help_hash).to include(:fifty_fifty)
     fifty_fifty = game_question.help_hash[:fifty_fifty]
     # правильный ответ 'b'
-    expect(fifty_fifty).to start_with('b')
+    expect(fifty_fifty).to start_with(game_question.correct_answer_key)
     expect(fifty_fifty.size).to eq 2
   end
 
