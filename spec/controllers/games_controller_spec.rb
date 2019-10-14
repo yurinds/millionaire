@@ -166,15 +166,13 @@ RSpec.describe GamesController, type: :controller do
       expect(flash[:warning]).to be
     end
 
-    it 'wrong player response' do
+    it 'wrong player answer' do
       # 'a' - заведомо неверный ответ
       put :answer, id: game_w_questions.id, letter: 'a'
       game = assigns(:game)
 
       expect(game.status).to eq :fail
       expect(game.finished?).to be_truthy
-
-      # expect(response.status).not_to eq(200) # всегда код 302, бесполезно это проверять
 
       expect(response).to redirect_to(user_path(user))
       expect(flash[:alert]).to be
